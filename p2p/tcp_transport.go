@@ -6,6 +6,23 @@ import (
 	"sync"
 )
 
+// Represents the remote node over a TCP established connection
+type TCPPeer struct {
+	// Underlying connection of the peer
+	conn net.Conn
+
+	// If we dial and retrieve a conn   -> outbound -> outbound == true
+	// If we accept and retrieve a conn -> inbound  -> outbound == false
+	outbound bool
+}
+
+func NewTCPPeer(conn net.Conn, outbound bool) *TCPPeer {
+	return &TCPPeer{
+		conn:     conn,
+		outbound: outbound,
+	}
+}
+
 type TCPTransport struct {
 	listenAddress string
 	listener      net.Listener
@@ -46,5 +63,7 @@ func (t *TCPTransport) startAcceptLoop() {
 }
 
 func (t *TCPTransport) handleConn(conn net.Conn) {
-	fmt.Printf("new incoming connection %v\n", conn)
+	peer := NewTCPPeer(conn, true)
+	// %+v includes field names
+	fmt.Printf("new incoming connection %+v\n", peer)
 }
