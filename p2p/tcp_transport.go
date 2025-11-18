@@ -13,7 +13,7 @@ type TCPTransport struct {
 	peers map[net.Addr]Peer
 }
 
-func NewTCPTransport(listenAddr string) Transport {
+func NewTCPTransport(listenAddr string) *TCPTransport {
 	return &TCPTransport{
 		listenAddress: listenAddr,
 	}
