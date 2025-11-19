@@ -1,13 +1,6 @@
 package p2p
 
-import "errors"
+// HandshakeFunc... ?
+type HandshakeFunc func(Peer) error
 
-// Returned if handshake between the local and remote code
-// cannot be established
-var ErrInvalidHandshake = errors.New("invalid handshake")
-
-type HandshakeFunc func(any) error
-
-func NOPHandshakeFunc(any) error {
-	return nil
-}
+func NOPHandshakeFunc(Peer) error { return nil }
