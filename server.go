@@ -58,6 +58,7 @@ func (s *FileServer) broadcast(msg *Message) error {
 		return err
 	}
 
+	// This is where we send messages to connected peers
 	for _, peer := range s.peers {
 		peer.Send([]byte{p2p.IncomingMessage})
 		if err := peer.Send(buf.Bytes()); err != nil {
@@ -131,11 +132,13 @@ func (s *FileServer) Store(key string, r io.Reader) error {
 		tee        = io.TeeReader(r, fileBuffer)
 	)
 
+	// Write file locally
 	size, err := s.store.Write(s.ID, key, tee)
 	if err != nil {
 		return err
 	}
 
+	// Create broadcast control message
 	msg := Message{
 		Payload: MessageStoreFile{
 			ID:   s.ID,
@@ -144,16 +147,24 @@ func (s *FileServer) Store(key string, r io.Reader) error {
 		},
 	}
 
+	// Broadcast messages to connected other peers (servers)
+	// Send encoded small packet declaring "a control message is coming"
 	if err := s.broadcast(&msg); err != nil {
 		return err
 	}
 
 	time.Sleep(time.Millisecond * 5)
 
+	// Converts Peers map to slice
 	peers := []io.Writer{}
 	for _, peer := range s.peers {
 		peers = append(peers, peer)
 	}
+
+	// After broadcasting, s3 sends the actual encrypted file bytes
+	// IncomingStream header sent to all peers
+	// MultiWriter writes encrypted file data to every peer simultaneously
+	// All peers receive this stream
 	mw := io.MultiWriter(peers...)
 	mw.Write([]byte{p2p.IncomingStream})
 	n, err := crypto.CopyEncrypt(s.EncKey, fileBuffer, mw)
