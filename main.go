@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"filesystem/crypto"
 	"filesystem/p2p"
 	"fmt"
 	"io/ioutil"
@@ -18,7 +19,7 @@ func makeServer(listenAddr string, nodes ...string) *FileServer {
 	tcpTransport := p2p.NewTCPTransport(tcptransportOpts)
 
 	fileServerOpts := FileServerOpts{
-		EncKey:            newEncryptionKey(),
+		EncKey:            crypto.NewEncryptionKey(),
 		StorageRoot:       listenAddr + "_network",
 		PathTransformFunc: CASPathTransformFunc,
 		Transport:         tcpTransport,

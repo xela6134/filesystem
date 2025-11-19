@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"errors"
+	"filesystem/crypto"
 	"fmt"
 	"io"
 	"log"
@@ -114,7 +115,7 @@ func (s *Store) WriteDecrypt(encKey []byte, id string, key string, r io.Reader) 
 	if err != nil {
 		return 0, err
 	}
-	n, err := copyDecrypt(encKey, r, f)
+	n, err := crypto.CopyDecrypt(encKey, r, f)
 	return int64(n), err
 }
 

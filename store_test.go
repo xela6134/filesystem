@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"filesystem/crypto"
 	"fmt"
 	"io/ioutil"
 	"testing"
@@ -23,7 +24,7 @@ func TestPathTransformFunc(t *testing.T) {
 
 func TestStore(t *testing.T) {
 	s := newStore()
-	id := generateID()
+	id := crypto.GenerateID()
 	defer teardown(t, s)
 
 	for i := 0; i < 50; i++ {

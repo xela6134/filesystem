@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"filesystem/crypto"
 	"filesystem/p2p"
 )
 
@@ -39,7 +40,7 @@ func NewFileServer(opts FileServerOpts) *FileServer {
 	}
 
 	if len(opts.ID) == 0 {
-		opts.ID = generateID()
+		opts.ID = crypto.GenerateID()
 	}
 
 	return &FileServer{
@@ -93,7 +94,7 @@ func (s *FileServer) Get(key string) (io.Reader, error) {
 	msg := Message{
 		Payload: MessageGetFile{
 			ID:  s.ID,
-			Key: hashKey(key),
+			Key: crypto.HashKey(key),
 		},
 	}
 
@@ -137,7 +138,7 @@ func (s *FileServer) Store(key string, r io.Reader) error {
 	msg := Message{
 		Payload: MessageStoreFile{
 			ID:   s.ID,
-			Key:  hashKey(key),
+			Key:  crypto.HashKey(key),
 			Size: size + 16,
 		},
 	}
@@ -154,7 +155,7 @@ func (s *FileServer) Store(key string, r io.Reader) error {
 	}
 	mw := io.MultiWriter(peers...)
 	mw.Write([]byte{p2p.IncomingStream})
-	n, err := copyEncrypt(s.EncKey, fileBuffer, mw)
+	n, err := crypto.CopyEncrypt(s.EncKey, fileBuffer, mw)
 	if err != nil {
 		return err
 	}
