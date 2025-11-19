@@ -12,13 +12,14 @@ import (
 
 	"filesystem/crypto"
 	"filesystem/p2p"
+	"filesystem/store"
 )
 
 type FileServerOpts struct {
 	ID                string
 	EncKey            []byte
 	StorageRoot       string
-	PathTransformFunc PathTransformFunc
+	PathTransformFunc store.PathTransformFunc
 	Transport         p2p.Transport
 	BootstrapNodes    []string
 }
@@ -29,12 +30,12 @@ type FileServer struct {
 	peerLock sync.Mutex
 	peers    map[string]p2p.Peer
 
-	store  *Store
+	store  *store.Store
 	quitch chan struct{}
 }
 
 func NewFileServer(opts FileServerOpts) *FileServer {
-	storeOpts := StoreOpts{
+	storeOpts := store.StoreOpts{
 		Root:              opts.StorageRoot,
 		PathTransformFunc: opts.PathTransformFunc,
 	}
@@ -45,7 +46,7 @@ func NewFileServer(opts FileServerOpts) *FileServer {
 
 	return &FileServer{
 		FileServerOpts: opts,
-		store:          NewStore(storeOpts),
+		store:          store.NewStore(storeOpts),
 		quitch:         make(chan struct{}),
 		peers:          make(map[string]p2p.Peer),
 	}

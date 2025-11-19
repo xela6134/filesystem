@@ -2,12 +2,14 @@ package main
 
 import (
 	"bytes"
-	"filesystem/crypto"
-	"filesystem/p2p"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"time"
+
+	"filesystem/crypto"
+	"filesystem/p2p"
+	"filesystem/store"
 )
 
 func makeServer(listenAddr string, nodes ...string) *FileServer {
@@ -21,7 +23,7 @@ func makeServer(listenAddr string, nodes ...string) *FileServer {
 	fileServerOpts := FileServerOpts{
 		EncKey:            crypto.NewEncryptionKey(),
 		StorageRoot:       listenAddr + "_network",
-		PathTransformFunc: CASPathTransformFunc,
+		PathTransformFunc: store.CASPathTransformFunc,
 		Transport:         tcpTransport,
 		BootstrapNodes:    nodes,
 	}
